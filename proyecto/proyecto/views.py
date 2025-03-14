@@ -8,16 +8,23 @@ def index(request):
 
 def lista_pacientes(request):
     try:
-        examen = Examen.objects.first()
-        if isinstance(examen.datos, str):  # Solo cargar si es un string
-            datos = json.loads(examen.datos)
-        else:
-            datos = examen.datos
+        examenes = Examen.objects.all()  
+        pacientes = {}  
         
-        pacientes = [{"nombre": nombre, "id": nombre} for nombre in datos.keys()]
-        return render(request, "pacientes.html", {"pacientes": pacientes})
+        for examen in examenes:
+            if isinstance(examen.datos, str):  
+                datos = json.loads(examen.datos)
+            else:
+                datos = examen.datos
+            
+            for nombre in datos.keys():
+                pacientes[nombre] = {"nombre": nombre, "id": nombre}  
+
+        return render(request, "pacientes.html", {"pacientes": list(pacientes.values())})
+    
     except Exception as e:
         return JsonResponse({"error": str(e)})
+
 
 def calcular_probabilidad_epilepsia_refractaria(eeg, mri, mirna, historia_clinica, test_neuropsicologico):
     probabilidad = 0
@@ -72,12 +79,21 @@ def calcular_probabilidad_epilepsia_refractaria(eeg, mri, mirna, historia_clinic
 def detalle_paciente(request, paciente_id):
     try:
         paciente_id = paciente_id.replace("%20", " ")
-        examen = Examen.objects.first()
-        if isinstance(examen.datos, str):  # Solo cargar si es un string
-            datos = json.loads(examen.datos)
-        else:
-            datos = examen.datos
+        examenes = Examen.objects.all()
+        print(examenes)
+        datos = None
+        for examen in examenes:
+            print(examen)
+            if isinstance(examen.datos, str):  # Solo cargar si es un string
+                datos_1 = json.loads(examen.datos)
+            else:
+                datos_1 = examen.datos
+            if paciente_id in datos_1:
+                datos = datos_1
+            print(datos)
+        print("NADA")
         print(paciente_id)
+        print(datos)
         if paciente_id not in datos:
             return JsonResponse({"error": "Paciente no encontrado"})
         
