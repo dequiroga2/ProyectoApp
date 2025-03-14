@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Lista de Pacientes</h1>
+    <ul>
+        <li><a href="#" onclick="verDiagnostico('Juan Perez')">Juan Perez</a></li>
+    </ul>
+    <p id="resultado"></p>
+
+    <script>
+        function verDiagnostico(nombre) {
+            let nombreCodificado = encodeURIComponent(nombre);  // Codificar nombre en URL
+            fetch(`/pacientes/${nombreCodificado}/`)  // Usar el nombre en la URL
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("resultado").innerText = "Diagnóstico: " + data.diagnostico;
+                })
+                .catch(error => console.error("Error al obtener el diagnóstico:", error));
+        }
+    </script>
+{% endblock %}
+
